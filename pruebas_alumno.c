@@ -114,6 +114,113 @@ void prueba_busqueda_en_arbol()
 		"Se encontró el elemento del subarbol derecho, sucesor inorden a raiz");
 }
 
+void prueba_eliminacion_en_arbol()
+{
+	abb_t *abb = abb_crear(comparador);
+	abb_t *abb_vacio = abb_crear(comparador);
+	int elemento = 23;
+	int elemento_2 = 15;
+	int elemento_3 = 27;
+	int elemento_4 = 25;
+	int elemento_5 = 17;
+	pa2m_afirmar(abb_quitar(NULL, &elemento) == NULL,
+		     "No se puede quitar de un arbol nulo");
+	pa2m_afirmar(abb_quitar(abb_vacio, &elemento) == NULL,
+		     "No se puede quitar de un arbol sin elementos");
+	abb_insertar(abb, &elemento);
+	abb_insertar(abb, &elemento_2);
+	abb_insertar(abb, &elemento_3);
+	abb_insertar(abb, &elemento_4);
+	abb_insertar(abb, &elemento_5);
+	pa2m_afirmar(abb_tamanio(abb) == 5,
+		     "Se insertan 5 elementos en el arbol");
+	void *elemento_quitado = NULL;
+	elemento_quitado = abb_quitar(abb, &elemento_3);
+	pa2m_afirmar(
+		abb->comparador(&elemento_3, elemento_quitado) == 0,
+		"Se ha quitado un elemento en el nivel 2 con rama izquierda no nula");
+	pa2m_afirmar(abb_tamanio(abb) == 4,
+		     "Se ha reducido el tamaño del arbol (4)");
+	pa2m_afirmar(abb->comparador(abb->nodo_raiz->derecha->elemento,
+				     &elemento_4) == 0,
+		     "El elemento del hijo derecho de la raíz es el correcto");
+	elemento_quitado = abb_quitar(abb, &elemento_4);
+	pa2m_afirmar(
+		abb->comparador(&elemento_4, elemento_quitado) == 0,
+		"Se quitó un elemento con hijos nulos (hijo derecho de raíz)");
+	pa2m_afirmar(abb->nodo_raiz->derecha == NULL,
+		     "El hijo derecho de la raíz quedó null");
+	pa2m_afirmar(abb_tamanio(abb) == 3,
+		     "Se ha reducido el tamaño del arbol (3)");
+	elemento_quitado = abb_quitar(abb, &elemento_2);
+	pa2m_afirmar(
+		abb->comparador(&elemento_2, elemento_quitado) == 0,
+		"Se ha quitado un elemento en el nivel 2 con rama derecha no nula");
+	pa2m_afirmar(abb_tamanio(abb) == 2,
+		     "Se ha reducido el tamaño del arbol (2)");
+	pa2m_afirmar(
+		abb->comparador(abb->nodo_raiz->izquierda->elemento,
+				&elemento_5) == 0,
+		"El elemento del hijo izquierdo de la raíz es el correcto");
+	elemento_quitado = abb_quitar(abb, &elemento_5);
+	pa2m_afirmar(
+		abb->comparador(&elemento_5, elemento_quitado) == 0,
+		"Se quitó un elemento con hijos nulos (hijo izquierdo de raíz)");
+	pa2m_afirmar(abb->nodo_raiz->izquierda == NULL,
+		     "El hijo izquierdo de la raíz quedó null");
+}
+
+void prueba_eliminacion_con_2_hijos_raiz()
+{
+	abb_t *abb = abb_crear(comparador);
+	int elemento = 23;
+	int elemento_2 = 15;
+	int elemento_3 = 27;
+	int elemento_4 = 25;
+	int elemento_5 = 17;
+	int elemento_6 = 10;
+	int elemento_7 = 30;
+	int elemento_8 = 16;
+	abb_insertar(abb, &elemento);
+	abb_insertar(abb, &elemento_2);
+	abb_insertar(abb, &elemento_3);
+	abb_insertar(abb, &elemento_4);
+	abb_insertar(abb, &elemento_5);
+	abb_insertar(abb, &elemento_6);
+	abb_insertar(abb, &elemento_7);
+	abb_insertar(abb, &elemento_8);
+	pa2m_afirmar(
+		abb_tamanio(abb) == 8,
+		"Se agregaron 8 elementos a la lista, en los dos hijos de la raíz");
+	void *elemento_quitado;
+	elemento_quitado = abb_quitar(abb, &elemento);
+	pa2m_afirmar(abb->comparador(&elemento, elemento_quitado) == 0,
+		     "Se quitó el elemento de la raiz (23)");
+	pa2m_afirmar(abb->comparador(abb->nodo_raiz->elemento, &elemento_5) ==
+			     0,
+		     "Se reemplazó por el predecesor inorden (17)");
+	elemento_quitado = abb_quitar(abb, &elemento_5);
+	pa2m_afirmar(abb->comparador(&elemento_5, elemento_quitado) == 0,
+		     "Se quitó el elemento de la raiz (17)");
+	pa2m_afirmar(abb->comparador(abb->nodo_raiz->elemento, &elemento_8) ==
+			     0,
+		     "Se reemplazó por el predecesor inorden (16)");
+	elemento_quitado = abb_quitar(abb, &elemento_8);
+	pa2m_afirmar(abb->comparador(&elemento_8, elemento_quitado) == 0,
+		     "Se quitó el elemento de la raiz (16)");
+	pa2m_afirmar(abb->comparador(abb->nodo_raiz->elemento, &elemento_2) ==
+			     0,
+		     "Se reemplazó por el predecesor inorden (15)");
+	abb_quitar(abb, &elemento_2);
+	abb_quitar(abb, &elemento_3);
+	abb_quitar(abb, &elemento_4);
+	abb_quitar(abb, &elemento_6);
+	abb_quitar(abb, &elemento_7);
+	pa2m_afirmar(
+		abb_vacio(abb) == true,
+		"Se eliminaron los elementos restantes a través de la raíz, el arbol quedó vacío");
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("\nPruebas creación de arbol");
@@ -122,6 +229,11 @@ int main()
 	prueba_insercion_en_arbol();
 	pa2m_nuevo_grupo("\nPruebas busqueda en arbol");
 	prueba_busqueda_en_arbol();
+	pa2m_nuevo_grupo("\n Pruebas eliminacion en arbol");
+	prueba_eliminacion_en_arbol();
+	pa2m_nuevo_grupo("\n Pruebas eliminacion con 2 hijos desde raíz");
+
+	prueba_eliminacion_con_2_hijos_raiz();
 
 	return pa2m_mostrar_reporte();
 }
