@@ -1,22 +1,22 @@
 # TDA ABB
 
-## Repositorio de (Nombre Apellido) - (Padrón) - (Mail)
+## Repositorio de Franco Daniel Olmedo - 109952 - francoolmedo424@gmail.com
 
 - Para compilar:
 
 ```bash
-línea de compilación
+gcc -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O2 -g src/*.c pruebas_alumno.c
 ```
 
 - Para ejecutar:
 
 ```bash
-línea de ejecución
+make pruebas_chanutron
 ```
 
 - Para ejecutar con valgrind:
 ```bash
-línea con valgrind
+make valgrind-chanutron
 ```
 ---
 ##  Funcionamiento
