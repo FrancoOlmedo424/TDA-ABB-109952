@@ -61,7 +61,6 @@ nodo_abb_t *extraigo_predecesor_inorden(nodo_abb_t *nodo,
 	}
 	nodo->derecha =
 		extraigo_predecesor_inorden(nodo->derecha, elemento_reemplazo);
-
 	return nodo;
 }
 
@@ -81,10 +80,7 @@ void *abb_quitar_recursivo(nodo_abb_t *raiz, void *elemento,
 				raiz->izquierda, &elemento_reemplazo);
 			raiz->elemento = elemento_reemplazo;
 			return raiz;
-
-		}
-
-		else {
+		} else {
 			nodo_abb_t *rama_izquierda = raiz->izquierda;
 			nodo_abb_t *rama_derecha = raiz->derecha;
 			free(raiz);
@@ -196,15 +192,12 @@ void abb_recorrido_inorder_recursivo(nodo_abb_t *nodo,
 		return;
 	abb_recorrido_inorder_recursivo(nodo->izquierda, funcion, aux,
 					veces_iterado, sigue_recorrido);
-
 	if (*sigue_recorrido == false)
 		return;
 	*sigue_recorrido = funcion(nodo->elemento, aux);
 	(*veces_iterado)++;
-
 	abb_recorrido_inorder_recursivo(nodo->derecha, funcion, aux,
 					veces_iterado, sigue_recorrido);
-
 	return;
 }
 
@@ -233,7 +226,6 @@ void abb_recorrido_postorder_recursivo(nodo_abb_t *nodo,
 {
 	if (nodo == NULL)
 		return;
-
 	abb_recorrido_postorder_recursivo(nodo->izquierda, funcion, aux,
 					  veces_iterado, sigue_recorrido);
 	abb_recorrido_postorder_recursivo(nodo->derecha, funcion, aux,
@@ -242,7 +234,6 @@ void abb_recorrido_postorder_recursivo(nodo_abb_t *nodo,
 		return;
 	*sigue_recorrido = funcion(nodo->elemento, aux);
 	(*veces_iterado)++;
-
 	return;
 }
 
