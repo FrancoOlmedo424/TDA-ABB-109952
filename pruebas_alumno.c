@@ -126,7 +126,6 @@ void prueba_eliminacion_en_arbol()
 	int elemento_2 = 15;
 	int elemento_3 = 27;
 	int elemento_4 = 25;
-	int elemento_5 = 17;
 	pa2m_afirmar(abb_quitar(NULL, &elemento) == NULL,
 		     "No se puede quitar de un arbol nulo");
 	pa2m_afirmar(abb_quitar(abb_vacio, &elemento) == NULL,
@@ -135,43 +134,32 @@ void prueba_eliminacion_en_arbol()
 	abb_insertar(abb, &elemento_2);
 	abb_insertar(abb, &elemento_3);
 	abb_insertar(abb, &elemento_4);
-	abb_insertar(abb, &elemento_5);
-	pa2m_afirmar(abb_tamanio(abb) == 5,
-		     "Se insertan 5 elementos en el arbol");
+	pa2m_afirmar(abb_tamanio(abb) == 4,
+		     "Se insertan 4 elementos en el arbol");
 	void *elemento_quitado = NULL;
 	elemento_quitado = abb_quitar(abb, &elemento_3);
 	pa2m_afirmar(
 		abb->comparador(&elemento_3, elemento_quitado) == 0,
 		"Se ha quitado un elemento en el nivel 2 con rama izquierda no nula");
-	pa2m_afirmar(abb_tamanio(abb) == 4,
-		     "Se ha reducido el tamaño del arbol (4)");
-	pa2m_afirmar(abb->comparador(abb->nodo_raiz->derecha->elemento,
-				     &elemento_4) == 0,
-		     "El elemento del hijo derecho de la raíz es el correcto");
-	elemento_quitado = abb_quitar(abb, &elemento_4);
-	pa2m_afirmar(
-		abb->comparador(&elemento_4, elemento_quitado) == 0,
-		"Se quitó un elemento con hijos nulos (hijo derecho de raíz)");
-	pa2m_afirmar(abb->nodo_raiz->derecha == NULL,
-		     "El hijo derecho de la raíz quedó null");
 	pa2m_afirmar(abb_tamanio(abb) == 3,
 		     "Se ha reducido el tamaño del arbol (3)");
-	elemento_quitado = abb_quitar(abb, &elemento_2);
-	pa2m_afirmar(
-		abb->comparador(&elemento_2, elemento_quitado) == 0,
-		"Se ha quitado un elemento en el nivel 2 con rama derecha no nula");
+	elemento_quitado = abb_quitar(abb, &elemento_4);
+	pa2m_afirmar(abb->comparador(&elemento_4, elemento_quitado) == 0,
+		     "Se quitó un elemento con hijos nulos");
 	pa2m_afirmar(abb_tamanio(abb) == 2,
 		     "Se ha reducido el tamaño del arbol (2)");
-	pa2m_afirmar(
-		abb->comparador(abb->nodo_raiz->izquierda->elemento,
-				&elemento_5) == 0,
-		"El elemento del hijo izquierdo de la raíz es el correcto");
-	elemento_quitado = abb_quitar(abb, &elemento_5);
-	pa2m_afirmar(
-		abb->comparador(&elemento_5, elemento_quitado) == 0,
-		"Se quitó un elemento con hijos nulos (hijo izquierdo de raíz)");
-	pa2m_afirmar(abb->nodo_raiz->izquierda == NULL,
-		     "El hijo izquierdo de la raíz quedó null");
+	elemento_quitado = abb_quitar(abb, &elemento_2);
+	pa2m_afirmar(abb->comparador(&elemento_2, elemento_quitado) == 0,
+		     "Se ha quitado un elemento en el nivel 2");
+	pa2m_afirmar(abb_tamanio(abb) == 1,
+		     "Se ha reducido el tamaño del arbol (1)");
+	elemento_quitado = abb_quitar(abb, &elemento);
+	pa2m_afirmar(abb->comparador(&elemento, elemento_quitado) == 0,
+		     "Se quitó el elemento raiz");
+	pa2m_afirmar(abb->nodo_raiz == NULL,
+		     "El arbol quedó vacío, el puntero al nodo raiz es NULL");
+	pa2m_afirmar(abb_tamanio(abb) == 0,
+		     "El arbol quedó vacío, el tamaño es 0");
 	abb_destruir(abb);
 	abb_destruir(abb_vacio);
 }

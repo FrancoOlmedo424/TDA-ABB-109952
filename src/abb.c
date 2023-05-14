@@ -160,12 +160,12 @@ void abb_destruir(abb_t *arbol)
 	abb_destruir_todo(arbol, NULL);
 }
 
-void *abb_destruir_todo_recursivo(nodo_abb_t *nodo,
-				  void (*destructor)(void *auxiliar),
-				  abb_comparador comparador)
+void abb_destruir_todo_recursivo(nodo_abb_t *nodo,
+				 void (*destructor)(void *auxiliar),
+				 abb_comparador comparador)
 {
 	if (nodo == NULL)
-		return NULL;
+		return;
 
 	abb_destruir_todo_recursivo(nodo->izquierda, destructor, comparador);
 
@@ -175,7 +175,7 @@ void *abb_destruir_todo_recursivo(nodo_abb_t *nodo,
 		destructor(nodo->elemento);
 	free(nodo);
 
-	return NULL;
+	return;
 }
 
 void abb_destruir_todo(abb_t *arbol, void (*destructor)(void *))
