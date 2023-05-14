@@ -28,10 +28,10 @@ nodo_abb_t *abb_insertar_recursivo(nodo_abb_t *raiz, void *elemento,
 		return nodo_insertar;
 	}
 
-	if (comparador(raiz->elemento, elemento) >= 0)
+	else if (comparador(raiz->elemento, elemento) >= 0)
 		raiz->izquierda = abb_insertar_recursivo(
 			raiz->izquierda, elemento, comparador, error);
-	if (comparador(raiz->elemento, elemento) < 0)
+	else if (comparador(raiz->elemento, elemento) < 0)
 		raiz->derecha = abb_insertar_recursivo(raiz->derecha, elemento,
 						       comparador, error);
 	return raiz;
@@ -113,39 +113,32 @@ void *abb_quitar(abb_t *arbol, void *elemento)
 						&elemento_quitado,
 						arbol->comparador,
 						&no_encontrado);
-	if (no_encontrado == true)
+	if (no_encontrado)
 		return NULL;
 	arbol->tamanio--;
 	return elemento_quitado;
 }
 
-void *abb_buscar_recursivo(nodo_abb_t *raiz, void *elemento,
-			   abb_comparador comparador, void *elemento_encontrado)
+void *abb_buscar_recursivo(nodo_abb_t *raiz, void *elemento_buscado,
+			   abb_comparador comparador)
 {
 	if (raiz == NULL)
 		return NULL;
-	if (comparador(raiz->elemento, elemento) == 0)
-		return raiz->elemento;
-	if (comparador(raiz->elemento, elemento) >= 0)
-		elemento_encontrado = abb_buscar_recursivo(raiz->izquierda,
-							   elemento, comparador,
-							   elemento_encontrado);
-	if (comparador(raiz->elemento, elemento) < 0)
-		elemento_encontrado = abb_buscar_recursivo(raiz->derecha,
-							   elemento, comparador,
-							   elemento_encontrado);
-	return elemento_encontrado;
+	if (comparador(raiz->elemento, elemento_buscado) > 0)
+		return abb_buscar_recursivo(raiz->izquierda, elemento_buscado,
+					    comparador);
+	else if (comparador(raiz->elemento, elemento_buscado) < 0)
+		return abb_buscar_recursivo(raiz->derecha, elemento_buscado,
+					    comparador);
+	return raiz->elemento;
 }
 
-void *abb_buscar(abb_t *arbol, void *elemento)
+void *abb_buscar(abb_t *arbol, void *elemento_buscado)
 {
-	void *elemento_encontrado = NULL;
 	if (abb_vacio(arbol))
 		return NULL;
-	elemento_encontrado = abb_buscar_recursivo(arbol->nodo_raiz, elemento,
-						   arbol->comparador,
-						   elemento_encontrado);
-	return elemento_encontrado;
+	return abb_buscar_recursivo(arbol->nodo_raiz, elemento_buscado,
+				    arbol->comparador);
 }
 
 bool abb_vacio(abb_t *arbol)
@@ -167,18 +160,16 @@ void abb_destruir(abb_t *arbol)
 	abb_destruir_todo(arbol, NULL);
 }
 
-nodo_abb_t *abb_destruir_todo_recursivo(nodo_abb_t *nodo,
-					void (*destructor)(void *auxiliar),
-					abb_comparador comparador)
+void *abb_destruir_todo_recursivo(nodo_abb_t *nodo,
+				  void (*destructor)(void *auxiliar),
+				  abb_comparador comparador)
 {
 	if (nodo == NULL)
 		return NULL;
 
-	nodo->izquierda = abb_destruir_todo_recursivo(nodo->izquierda,
-						      destructor, comparador);
+	abb_destruir_todo_recursivo(nodo->izquierda, destructor, comparador);
 
-	nodo->derecha = abb_destruir_todo_recursivo(nodo->derecha, destructor,
-						    comparador);
+	abb_destruir_todo_recursivo(nodo->derecha, destructor, comparador);
 
 	if (destructor != NULL)
 		destructor(nodo->elemento);
@@ -190,70 +181,69 @@ nodo_abb_t *abb_destruir_todo_recursivo(nodo_abb_t *nodo,
 void abb_destruir_todo(abb_t *arbol, void (*destructor)(void *))
 {
 	if (arbol != NULL) {
-		arbol->nodo_raiz = abb_destruir_todo_recursivo(
-			arbol->nodo_raiz, destructor, arbol->comparador);
+		abb_destruir_todo_recursivo(arbol->nodo_raiz, destructor,
+					    arbol->comparador);
 		free(arbol);
 	}
 }
 
-nodo_abb_t *abb_recorrido_inorder_recursivo(nodo_abb_t *nodo,
-					    bool (*funcion)(void *, void *),
-					    void *aux, size_t *veces_iterado,
-					    bool *sigue_recorrido)
+void abb_recorrido_inorder_recursivo(nodo_abb_t *nodo,
+				     bool (*funcion)(void *, void *), void *aux,
+				     size_t *veces_iterado,
+				     bool *sigue_recorrido)
 {
 	if (nodo == NULL)
-		return NULL;
-	nodo->izquierda = abb_recorrido_inorder_recursivo(
-		nodo->izquierda, funcion, aux, veces_iterado, sigue_recorrido);
+		return;
+	abb_recorrido_inorder_recursivo(nodo->izquierda, funcion, aux,
+					veces_iterado, sigue_recorrido);
 
 	if (*sigue_recorrido == false)
-		return nodo;
+		return;
 	*sigue_recorrido = funcion(nodo->elemento, aux);
-	*veces_iterado = *veces_iterado + 1;
+	(*veces_iterado)++;
 
-	nodo->derecha = abb_recorrido_inorder_recursivo(
-		nodo->derecha, funcion, aux, veces_iterado, sigue_recorrido);
+	abb_recorrido_inorder_recursivo(nodo->derecha, funcion, aux,
+					veces_iterado, sigue_recorrido);
 
-	return nodo;
+	return;
 }
 
-nodo_abb_t *abb_recorrido_preorder_recursivo(nodo_abb_t *nodo,
-					     bool (*funcion)(void *, void *),
-					     void *aux, size_t *veces_iterado,
-					     bool *sigue_recorrido)
+void abb_recorrido_preorder_recursivo(nodo_abb_t *nodo,
+				      bool (*funcion)(void *, void *),
+				      void *aux, size_t *veces_iterado,
+				      bool *sigue_recorrido)
 {
 	if (nodo == NULL)
-		return NULL;
+		return;
 	if (*sigue_recorrido == false)
-		return nodo;
+		return;
 	*sigue_recorrido = funcion(nodo->elemento, aux);
-	*veces_iterado = *veces_iterado + 1;
-	nodo->izquierda = abb_recorrido_preorder_recursivo(
-		nodo->izquierda, funcion, aux, veces_iterado, sigue_recorrido);
-	nodo->derecha = abb_recorrido_preorder_recursivo(
-		nodo->derecha, funcion, aux, veces_iterado, sigue_recorrido);
-
-	return nodo;
+	(*veces_iterado)++;
+	abb_recorrido_preorder_recursivo(nodo->izquierda, funcion, aux,
+					 veces_iterado, sigue_recorrido);
+	abb_recorrido_preorder_recursivo(nodo->derecha, funcion, aux,
+					 veces_iterado, sigue_recorrido);
+	return;
 }
 
-nodo_abb_t *abb_recorrido_postorder_recursivo(nodo_abb_t *nodo,
-					      bool (*funcion)(void *, void *),
-					      void *aux, size_t *veces_iterado,
-					      bool *sigue_recorrido)
+void abb_recorrido_postorder_recursivo(nodo_abb_t *nodo,
+				       bool (*funcion)(void *, void *),
+				       void *aux, size_t *veces_iterado,
+				       bool *sigue_recorrido)
 {
 	if (nodo == NULL)
-		return NULL;
+		return;
 
-	nodo->izquierda = abb_recorrido_postorder_recursivo(
-		nodo->izquierda, funcion, aux, veces_iterado, sigue_recorrido);
-	nodo->derecha = abb_recorrido_postorder_recursivo(
-		nodo->derecha, funcion, aux, veces_iterado, sigue_recorrido);
+	abb_recorrido_postorder_recursivo(nodo->izquierda, funcion, aux,
+					  veces_iterado, sigue_recorrido);
+	abb_recorrido_postorder_recursivo(nodo->derecha, funcion, aux,
+					  veces_iterado, sigue_recorrido);
 	if (*sigue_recorrido == false)
-		return nodo;
+		return;
 	*sigue_recorrido = funcion(nodo->elemento, aux);
-	*veces_iterado = *veces_iterado + 1;
+	(*veces_iterado)++;
 
-	return nodo;
+	return;
 }
 
 size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
@@ -267,11 +257,11 @@ size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
 		abb_recorrido_inorder_recursivo(arbol->nodo_raiz, funcion, aux,
 						&i, &recorre);
 	else if (recorrido == PREORDEN)
-		arbol->nodo_raiz = abb_recorrido_preorder_recursivo(
-			arbol->nodo_raiz, funcion, aux, &i, &recorre);
+		abb_recorrido_preorder_recursivo(arbol->nodo_raiz, funcion, aux,
+						 &i, &recorre);
 	else if (recorrido == POSTORDEN)
-		arbol->nodo_raiz = abb_recorrido_postorder_recursivo(
-			arbol->nodo_raiz, funcion, aux, &i, &recorre);
+		abb_recorrido_postorder_recursivo(arbol->nodo_raiz, funcion,
+						  aux, &i, &recorre);
 	return i;
 }
 
@@ -300,19 +290,17 @@ size_t abb_recorrer(abb_t *arbol, abb_recorrido recorrido, void **array,
 	vector.cantidad_elementos = 0;
 	if (abb_vacio(arbol) == true)
 		return 0;
-	if (recorrido == INORDEN) {
+	if (recorrido == INORDEN)
 		return abb_con_cada_elemento(arbol, recorrido,
 					     insertar_elementos_en_vector,
 					     &vector);
-	} else if (recorrido == PREORDEN) {
+	else if (recorrido == PREORDEN)
 		return abb_con_cada_elemento(arbol, recorrido,
 					     insertar_elementos_en_vector,
 					     &vector);
-	} else if (recorrido == POSTORDEN) {
+	else if (recorrido == POSTORDEN)
 		return abb_con_cada_elemento(arbol, recorrido,
 					     insertar_elementos_en_vector,
 					     &vector);
-		;
-	}
-	return vector.tamanio;
+	return 0;
 }
